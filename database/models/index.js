@@ -6,12 +6,27 @@ const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../../config/migrationConfig.js')[env];
+import url from 'url';
+import allConfig from '../config/config.js';
 const db = {};
 
 let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
+if (env === 'production') {
+  // Break apart the Heroku database url and rebuild the configs we need
+  const { DATABASE_URL } = process.env;
+  const dbUrl = url.parse(DATABASE_URL);
+  const username = dbUrl.auth.substr(0, dbUrl.auth.indexOf(':'));
+  const password = dbUrl.auth.substr(dbUrl.auth.indexOf(':') + 1, dbUrl.auth.length);
+  const dbName = dbUrl.path.slice(1);
+  const host = dbUrl.hostname;
+  const { port } = dbUrl;
+  config.host = host;
+  config.port = port;
+  sequelize = new Sequelize(dbName, username, password, config);
+}
+
+// If env is not production, retrieve DB auth details from the config
+else {
   sequelize = new Sequelize(config.database, config.username, config.password, config);
 }
 
