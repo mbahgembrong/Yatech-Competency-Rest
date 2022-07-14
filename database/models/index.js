@@ -14,16 +14,25 @@ const db = {};
 let sequelize;
 if (env === 'production') {
   // Break apart the Heroku database url and rebuild the configs we need
-  const { DATABASE_URL } = process.env;
-  const dbUrl = url.parse(DATABASE_URL);
-  const username = dbUrl.auth.substr(0, dbUrl.auth.indexOf(':'));
-  const password = dbUrl.auth.substr(dbUrl.auth.indexOf(':') + 1, dbUrl.auth.length);
-  const dbName = dbUrl.path.slice(1);
-  const host = dbUrl.hostname;
-  const { port } = dbUrl;
-  config.host = host;
-  config.port = port;
-  sequelize = new Sequelize(dbName, username, password, config);
+  const Sequelize = require('sequelize');
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    }
+  }
+  );
+
+  sequelize
+    .authenticate()
+    .then(() => {
+      console.log('Connection has been established successfully.');
+    })
+    .catch(err => {
+      console.error('Unable to connect to the database:', err);
+    });
 }
 
 // If env is not production, retrieve DB auth details from the config
