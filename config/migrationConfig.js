@@ -1,6 +1,6 @@
-const config = require('./index')
+// const config = require('./index')
 
-const cfg = {}
-cfg[config.environment] = config.sequelize;
+// const cfg = {}
+// cfg[config.environment] = config.sequelize;
 
-module.exports = cfg
+// module.exports = cfg
