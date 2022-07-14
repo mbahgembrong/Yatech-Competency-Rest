@@ -7,7 +7,7 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 // const config = require(__dirname + '/../../config/migrationConfig.js')[env];
 const url = require('url');
-import allConfig from '../config/config.js';
+const allConfig = require('../config/config.js');
 const config = allConfig[env];
 const db = {};
 
